@@ -54,7 +54,7 @@ void loop()
   sVector_t mag = compass.readRaw();
   compass.getHeadingDegrees();
 
-  Serial.println(mag.HeadingDegress); Serial.print("\t");
+  Serial.print(mag.HeadingDegress); Serial.print("\t"); Serial.print("\t");
   Serial.print(mag.XAxis); Serial.print("\t");
   Serial.print(mag.YAxis); Serial.print("\t");
   Serial.print(mag.ZAxis); Serial.print("\t");
