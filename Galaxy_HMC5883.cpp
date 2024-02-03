@@ -1,16 +1,16 @@
 ﻿/*!
  * @file Galaxy_HMC5883.cpp
  * @brief Simple connect HMC5883
- * @copyright   Copyright (c) 2024 Murnik Roman
+ * @copyright   Copyright (c) 2024 Roman Murnik
  * @license     The MIT License (MIT)
- * @author      Murnik Roman (murnikr@gmail.com)
- * @version  V1.0.0
+ * @author      Roman Murnik
+ * @version  V0.0.2
  * @date  2024-02-02
  * @url https://github.com/error911/Galaxy_HMC5883
  */
 #include "Galaxy_HMC5883.h"
 
-Galaxy_HMC5883::Galaxy_HMC5883(TwoWire *pWire, uint8_t I2C_addr)
+Galaxy_HMC5883::Galaxy_HMC5883(uint8_t I2C_addr)
 {
   isHMC_ = false;
   minX  = 0;
@@ -20,7 +20,7 @@ Galaxy_HMC5883::Galaxy_HMC5883(TwoWire *pWire, uint8_t I2C_addr)
   minZ  = 0;
   maxZ  = 0;
   firstRun = true;
-  this->_pWire = pWire;
+  this->_pWire = &Wire;
   this->_I2C_addr = I2C_addr;
 }
 
@@ -65,18 +65,15 @@ bool Galaxy_HMC5883::begin(void)
   return ret;
 }
 
-sVector_t Galaxy_HMC5883::readRaw(void)
+Vector_t Galaxy_HMC5883::readRaw(void)
 {
   if(ICType == IC_HMC5883L)
   {
-    v.XAxis = readRegister16(HMC5883L_REG_OUT_X_M);
-    v.YAxis = readRegister16(HMC5883L_REG_OUT_Y_M);
-    v.ZAxis = readRegister16(HMC5883L_REG_OUT_Z_M);
+    rawData.x = readRegister16(HMC5883L_REG_OUT_X_M);
+    rawData.y = readRegister16(HMC5883L_REG_OUT_Y_M);
+    rawData.z = readRegister16(HMC5883L_REG_OUT_Z_M);
   }
-  v.AngleXY = (atan2((double)v.YAxis,(double)v.XAxis) * (180 / 3.14159265) + 180);
-  v.AngleXZ = (atan2((double)v.ZAxis,(double)v.XAxis) * (180 / 3.14159265) + 180);
-  v.AngleYZ = (atan2((double)v.ZAxis,(double)v.YAxis) * (180 / 3.14159265) + 180);
-  return v;
+  return rawData;
 }
 
 void Galaxy_HMC5883::setRange(eRange_t range)
@@ -230,15 +227,21 @@ void Galaxy_HMC5883::setDeclinationAngle(float declinationAngle)
   this->ICdeclinationAngle = declinationAngle;
 }
 
-void Galaxy_HMC5883::getHeadingDegrees(void)
+float Galaxy_HMC5883::getHeadingDegrees(void)
 {
-  float heading = atan2(v.YAxis ,v.XAxis);
+  float heading = atan2(rawData.y ,rawData.x);
   heading += this->ICdeclinationAngle;
   if(heading < 0)
     heading += 2*PI;
   if(heading > 2*PI)
     heading -= 2*PI;
-  v.HeadingDegress = heading * 180/PI;
+
+  //AngleXY = (atan2((double)rawData.y,(double)rawData.x) * (180 / PI) + 180);
+  //AngleXZ = (atan2((double)rawData.z,(double)rawData.x) * (180 / PI) + 180);
+  //AngleYZ = (atan2((double)rawData.z,(double)rawData.y) * (180 / PI) + 180);
+
+  float headingDegress = heading * 180/PI;
+  return headingDegress;
 }
 
 int Galaxy_HMC5883::getICType(void)

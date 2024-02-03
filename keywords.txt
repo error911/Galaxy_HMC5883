@@ -6,6 +6,7 @@
 # Datatypes (KEYWORD1)
 #######################################
 Galaxy_HMC5883	KEYWORD1
+HMC5883	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

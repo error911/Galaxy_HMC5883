@@ -1,13 +1,13 @@
 ﻿/*!
  * @license     The MIT License (MIT)
- * @author      Murnik Roman
- * @version     V1.0.0
+ * @author      Roman Murnik
+ * @version     V0.0.2
  * @date        2024-02-02
  * @url         https://github.com/error911/Galaxy_HMC5883
  */
 #include <Galaxy_HMC5883.h>
 
-Galaxy_HMC5883 compass(&Wire, HMC5883L_ADDRESS);
+Galaxy_HMC5883 compass(HMC5883L_ADDRESS);
 
 void setup()
 {
@@ -51,13 +51,13 @@ void loop()
   float declinationAngle = (4.0 + (26.0 / 60.0)) / (180 / PI);
   compass.setDeclinationAngle(declinationAngle);
 
-  sVector_t mag = compass.readRaw();
-  compass.getHeadingDegrees();
+  Vector_t mag = compass.readRaw();
+  float heading = compass.getHeadingDegrees();
 
-  Serial.print(mag.HeadingDegress); Serial.print("\t"); Serial.print("\t");
-  Serial.print(mag.XAxis); Serial.print("\t");
-  Serial.print(mag.YAxis); Serial.print("\t");
-  Serial.print(mag.ZAxis); Serial.print("\t");
+  Serial.print(heading); Serial.print("\t"); Serial.print("\t");
+  Serial.print(mag.x); Serial.print("\t");
+  Serial.print(mag.y); Serial.print("\t");
+  Serial.print(mag.z); Serial.print("\t");
   Serial.println();
 
   delay(100);

@@ -1,10 +1,10 @@
 ﻿/*!
  * @file Galaxy_HMC5883.h
  * @brief Simple connect HMC5883
- * @copyright   Copyright (c) 2024 Murnik Roman
+ * @copyright   Copyright (c) 2024 Roman Murnik
  * @license     The MIT License (MIT)
- * @author      Murnik Roman (murnikr@gmail.com)
- * @version  V1.0.0
+ * @author      Roman Murnik
+ * @version  V0.0.2
  * @date  2024-02-02
  * @url https://github.com/error911/Galaxy_HMC5883
  */
@@ -25,8 +25,8 @@
 
 #define IC_NONE     0
 #define IC_HMC5883L 1
-#define IC_QMC5883  2
-#define IC_VCM5883L 3
+//#define IC_QMC5883  2
+//#define IC_VCM5883L 3
 #define IC_ERROR    4
 
 #define HMC5883L_REG_CONFIG_A         (0x00)
@@ -55,7 +55,7 @@ typedef enum
 {
   HMC5883L_DATARATE_75HZ       = 0b110,
   HMC5883L_DATARATE_30HZ       = 0b101,
-  HMC5883L_DATARATE_15HZ       = 0b100,
+  HMC5883L_DATARATE_15HZ       = 0b100, // Default
   HMC5883L_DATARATE_7_5HZ      = 0b011,
   HMC5883L_DATARATE_3HZ        = 0b010,
   HMC5883L_DATARATE_1_5HZ      = 0b001,
@@ -64,14 +64,14 @@ typedef enum
 
 typedef enum
 {
-  HMC5883L_RANGE_8_1GA     = 0b111,
-  HMC5883L_RANGE_5_6GA     = 0b110,
-  HMC5883L_RANGE_4_7GA     = 0b101,
-  HMC5883L_RANGE_4GA       = 0b100,
-  HMC5883L_RANGE_2_5GA     = 0b011,
-  HMC5883L_RANGE_1_9GA     = 0b010,
-  HMC5883L_RANGE_1_3GA    = 0b001,
-  HMC5883L_RANGE_0_88GA    = 0b000
+  HMC5883L_RANGE_8_1GA     = 0b111,   //± 8.1 Ga Gain(LSb/Gauss)=230
+  HMC5883L_RANGE_5_6GA     = 0b110,   //± 5.6 Ga Gain(LSb/Gauss)=330
+  HMC5883L_RANGE_4_7GA     = 0b101,   //± 4.7 Ga Gain(LSb/Gauss)=390
+  HMC5883L_RANGE_4GA       = 0b100,   //± 4.0 Ga Gain(LSb/Gauss)=440
+  HMC5883L_RANGE_2_5GA     = 0b011,   //± 2.5 Ga Gain(LSb/Gauss)=660
+  HMC5883L_RANGE_1_9GA     = 0b010,   //± 1.9 Ga Gain(LSb/Gauss)=820
+  HMC5883L_RANGE_1_3GA     = 0b001,   //± 1.3 Ga  Gain(LSb/Gauss)=1090 (default)
+  HMC5883L_RANGE_0_88GA    = 0b000    //± 0.88 Ga Gain(LSb/Gauss)=1370
 } eRange_t;
 
 typedef enum
@@ -85,20 +85,16 @@ typedef enum
 #define VECTOR_STRUCT_H
 typedef struct 
 {
-  int16_t XAxis;
-  int16_t YAxis;
-  int16_t ZAxis;
-  float   AngleXY;
-  float   AngleXZ;
-  float   AngleYZ;
-  float   HeadingDegress;
-} sVector_t;
+  int16_t x;
+  int16_t y;
+  int16_t z;
+} Vector_t;
 #endif
 
 class Galaxy_HMC5883
 {
   public:
-    Galaxy_HMC5883(TwoWire*pWire = &Wire, uint8_t I2C_addr = 0x0C);
+    Galaxy_HMC5883(/*TwoWire*pWire = &Wire, */uint8_t I2C_addr = 0x0C);
     /**
      * @fn begin
      * @brief Sensor init
@@ -113,7 +109,7 @@ class Galaxy_HMC5883
      * @brief Get the data collected by the sensor
      * @return sVector_t The data collected by the sensor
      */
-    sVector_t readRaw(void);
+    Vector_t readRaw(void);
 
     /**
      * @fn setRange
@@ -160,7 +156,7 @@ class Galaxy_HMC5883
      * @param dataRate
      * @n     HMC5883L_DATARATE_75HZ
      * @n     HMC5883L_DATARATE_30HZ
-     * @n     HMC5883L_DATARATE_15HZ
+     * @n     HMC5883L_DATARATE_15HZ (Default)
      * @n     HMC5883L_DATARATE_7_5HZ
      * @n     HMC5883L_DATARATE_3HZ
      * @n     HMC5883L_DATARATE_1_5HZ
@@ -182,7 +178,7 @@ class Galaxy_HMC5883
      * @n     HMC5883L_SAMPLES_8
      * @n     HMC5883L_SAMPLES_4
      * @n     HMC5883L_SAMPLES_2
-     * @n     HMC5883L_SAMPLES_1
+     * @n     HMC5883L_SAMPLES_1  (Default)
       */
     void  setSamples(eSamples_t samples);
 
@@ -202,9 +198,9 @@ class Galaxy_HMC5883
 
     /**
      * @fn getHeadingDegrees
-     * @brief Set the sensor range
+     * @brief Get heading (include declination angle)
      */
-    void getHeadingDegrees(void);
+    float getHeadingDegrees(void);
 
     /**
      * @fn getICType
@@ -234,7 +230,7 @@ class Galaxy_HMC5883
     bool isHMC_;
     float mgPerDigit;
     float Gauss_LSB_XY = 1090.0;
-    sVector_t v;
+    Vector_t rawData;
     float minX, maxX;
     float minY, maxY;
     float minZ, maxZ;
