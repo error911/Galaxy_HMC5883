@@ -73,18 +73,6 @@ sVector_t Galaxy_HMC5883::readRaw(void)
     v.YAxis = readRegister16(HMC5883L_REG_OUT_Y_M);
     v.ZAxis = readRegister16(HMC5883L_REG_OUT_Z_M);
   }
-  else if(ICType == IC_QMC5883)
-  {
-    v.XAxis = readRegister16(QMC5883_REG_OUT_X_L);
-    v.YAxis = readRegister16(QMC5883_REG_OUT_Y_L);
-    v.ZAxis = readRegister16(QMC5883_REG_OUT_Z_L);
-  }
-  else if(ICType == IC_VCM5883L)
-  {
-    v.XAxis = -readRegister16(VCM5883L_REG_OUT_X_L);
-    v.YAxis = -readRegister16(VCM5883L_REG_OUT_Y_L);
-    v.ZAxis = -readRegister16(VCM5883L_REG_OUT_Z_L);
-  }
   v.AngleXY = (atan2((double)v.YAxis,(double)v.XAxis) * (180 / 3.14159265) + 180);
   v.AngleXZ = (atan2((double)v.ZAxis,(double)v.XAxis) * (180 / 3.14159265) + 180);
   v.AngleYZ = (atan2((double)v.ZAxis,(double)v.YAxis) * (180 / 3.14159265) + 180);
